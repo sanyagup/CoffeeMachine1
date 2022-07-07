@@ -1,3 +1,5 @@
+import decimal
+
 MENU = {
     "espresso": {
         "ingredients": {
@@ -30,7 +32,6 @@ resources = {
     "coffee": 100,
 }
 
-
 def calculations():
     quarters = int(input("How many quarters?: "))
     nickels = int(input("How many nickels?: "))
@@ -45,12 +46,13 @@ def calculations():
 
 
 def check(resources, MENU, choice, user_money):
-
+    two_places = decimal.Decimal(10) ** -2
     milk1 = 0
     water1 = 0
     coffee1 = 0
     change = 0
     cost1 = 0
+    choice1 = " "
 
     water = resources["water"]
     milk = resources["milk"]
@@ -71,47 +73,93 @@ def check(resources, MENU, choice, user_money):
         milk1 = MENU["cappuccino"]["ingredients"]["milk"]
         cost1 = MENU["cappuccino"]["cost"]
 
-    print(cost1)
     if water < water1:
+        print(water1)
         print("Sorry there is not enough water left. ")
-        return -1
+        choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
+        if choice1 == "n":
+            return "n"
+    elif user_money > 0:
+        resources["water"] = water - water1
     if milk < milk1:
         print("Sorry there is not enough milk left. ")
-        return -1
+        choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
+        if choice1 == "n":
+            return "n"
+    elif user_money > 0:
+        resources["milk"] = milk - milk1
     if coffee < coffee1:
         print("Sorry there is not enough coffee left. ")
-        return -1
-    if user_money < cost1:
-        print("You do not have enough money to purchase this. ")
-        return -1
-    if user_money > cost1:
-        change = cost1 - user_money
-        user_money -= cost1
-        return change
+        choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
+        if choice1 == "n":
+            return "n"
+    elif user_money > 0:
+        resources["coffee"] = coffee - coffee1
+
+    return resources
 
 
 cup_counter = 0
 user_money = 0
 total_money = 0
+
+two_places = decimal.Decimal(10) ** -2
+
 while cup_counter >= 0:
     user_money = 0
+    price = 0.0
+    change = 0
+    cost1 = 0
     print(f"cup_counter {cup_counter}")
+    for x in resources:
+        print(f"{x}: {resources[x]}")
+    print(f"Money: ${total_money}")
     choice = input("What would you like? (espresso/latte/cappuccino): ")
 
     if choice == "report":
         for x in resources:
             print(f"{x}: {resources[x]}")
         print(f"Money: ${total_money}")
-    if choice == "espresso":
+
+    if choice == "espresso" or choice == "latte" or choice == "cappuccino":
+        if choice == "espresso":
+            cost1 = MENU["espresso"]["cost"]
+        if choice == "latte":
+            cost1 = MENU["latte"]["cost"]
+        if choice == "cappuccino":
+            cost1 = MENU["cappuccino"]["cost"]
+
         user_money = calculations()
-        user_change = check(resources, MENU, choice, user_money)
-        if user_change == -1:
+        if user_money < cost1:
+            user_money = 0
+            print("You do not have enough money to purchase this. ")
             choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
             if choice1 == "n":
                 cup_counter = -1
-        else:
-            print(f"Your change is {user_change}")
+
+        used_resources = check(resources, MENU, choice, user_money)
+        if used_resources == "n":
+            cup_counter = -1
+
+        if user_money > cost1 or user_money == cost1:
+            change = decimal.Decimal(user_money - cost1).quantize(two_places)
+            user_money -= cost1
+            print(f"Thank you for purchasing {choice}. Have a great day!!")
+            print(f"Your change is {change}")
+            if choice == "espresso":
+                price = MENU["espresso"]["cost"]
+                total_money += price
+                total_money = decimal.Decimal(total_money).quantize(two_places)
+            if choice == "latte":
+                price = decimal.Decimal(MENU["latte"]["cost"]).quantize(two_places)
+                total_money += price
+                total_money = decimal.Decimal(total_money).quantize(two_places)
+            if choice == "cappuccino":
+                price = MENU["cappuccino"]["cost"]
+                total_money = decimal.Decimal(total_money).quantize(two_places)
+                total_money += price
             cup_counter += 1
+
     if choice == "off":
         cup_counter = -1
 
