@@ -53,6 +53,7 @@ def check(resources, MENU, choice, user_money):
     change = 0
     cost1 = 0
     choice1 = " "
+    counter = 0
 
     water = resources["water"]
     milk = resources["milk"]
@@ -74,29 +75,28 @@ def check(resources, MENU, choice, user_money):
         cost1 = MENU["cappuccino"]["cost"]
 
     if water < water1:
-        print(water1)
         print("Sorry there is not enough water left. ")
-        choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
-        if choice1 == "n":
-            return "n"
-    elif user_money > 0:
+        counter += 1
+    elif user_money >= 0:
         resources["water"] = water - water1
     if milk < milk1:
         print("Sorry there is not enough milk left. ")
-        choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
-        if choice1 == "n":
-            return "n"
-    elif user_money > 0:
+        counter += 1
+    elif user_money >= 0:
         resources["milk"] = milk - milk1
     if coffee < coffee1:
         print("Sorry there is not enough coffee left. ")
+        counter += 1
+    elif user_money >= 0:
+        resources["coffee"] = coffee - coffee1
+    if counter > 0:
         choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
         if choice1 == "n":
             return "n"
-    elif user_money > 0:
-        resources["coffee"] = coffee - coffee1
-
-    return resources
+        if choice1 == "y":
+            return "y"
+    else:
+        return resources
 
 
 cup_counter = 0
@@ -106,6 +106,7 @@ latte_price = MENU["latte"]["cost"]
 cappuccino_price = MENU["cappuccino"]["cost"]
 espresso_price = MENU["espresso"]["cost"]
 two_places = decimal.Decimal(10) ** -2
+buy = True
 
 while cup_counter >= 0:
     user_money = 0
@@ -130,16 +131,22 @@ while cup_counter >= 0:
 
         user_money = calculations()
         if user_money < cost1:
-            user_money = 0
+            user_money = 0.0
             print("You do not have enough money to purchase this. ")
             choice1 = input(f"Would you like to purchase something else besides {choice}? y or n: ")
             if choice1 == "n":
-                cup_counter = -1
+                break
+            if choice1 == "y":
+                user_money = 0.0
+                choice = " "
 
         used_resources = check(resources, MENU, choice, user_money)
         if used_resources == "n":
-            cup_counter = -1
+            break
+        if used_resources == "y":
+            buy = False
 
+    if buy is True:
         if user_money > cost1 or user_money == cost1:
             change = decimal.Decimal(user_money - cost1).quantize(two_places)
             user_money -= cost1
@@ -156,11 +163,8 @@ while cup_counter >= 0:
             if choice == "cappuccino":
                 price = MENU["cappuccino"]["cost"]
                 total_money = decimal.Decimal(total_money).quantize(two_places)
-                total_money += price
+                total_money += decimal.Decimal(price).quantize(two_places)
             cup_counter += 1
-    choice3 = input("Do you want to purchase another drink? y or n: ")
-    if choice3 == "n":
-        cup_counter = -1
     if choice == "off":
         cup_counter = -1
 
