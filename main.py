@@ -101,7 +101,7 @@ def check(resources, MENU, choice, user_money):
 
 cup_counter = 0
 user_money = 0
-total_money = 0
+total_money = 0.0
 latte_price = MENU["latte"]["cost"]
 cappuccino_price = MENU["cappuccino"]["cost"]
 espresso_price = MENU["espresso"]["cost"]
@@ -112,7 +112,7 @@ while cup_counter >= 0:
     price = 0.0
     change = 0
     cost1 = 0
-    print(f"Latte price: {latte_price}, Coffee price: {cappuccino_price}, Espresso price: {espresso_price}")
+    print(f"Latte price: {latte_price}, Cappuccino price: {cappuccino_price}, Espresso price: {espresso_price}")
     choice = input("What would you like? (espresso/latte/cappuccino): ")
 
     if choice == "report":
@@ -158,7 +158,7 @@ while cup_counter >= 0:
                 total_money = decimal.Decimal(total_money).quantize(two_places)
                 total_money += price
             cup_counter += 1
-    choice3 = input("Do you want to purchase another drink?")
+    choice3 = input("Do you want to purchase another drink? y or n: ")
     if choice3 == "n":
         cup_counter = -1
     if choice == "off":
