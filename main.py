@@ -38,7 +38,7 @@ def calculations():
     dimes = int(input("How many dimes?: "))
     pennies = int(input("How many pennies: "))
     q = .25
-    n = .5
+    n = .05
     d = .10
     p = .01
     money = q * quarters + n * nickels + d * dimes + p * pennies
